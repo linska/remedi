@@ -5,11 +5,13 @@ class CalendarInfo extends StatelessWidget {
     required this.onSwipeUpClose,
     required this.onVerticalDragUpdate,
     required this.onVerticalDragEnd,
+    required this.height,
     super.key,
   });
   final VoidCallback onSwipeUpClose;
   final ValueChanged<double> onVerticalDragUpdate;
   final ValueChanged<double> onVerticalDragEnd;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class CalendarInfo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 400,
+              height: height,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 192, 207, 255),
                 borderRadius: BorderRadius.only(
@@ -31,10 +33,10 @@ class CalendarInfo extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color.fromARGB(102, 26, 49, 123), // колір тіні
-                    spreadRadius: 2, // наскільки "розповзається"
-                    blurRadius: 8, // ступінь розмиття
-                    offset: const Offset(0, 4), // зміщення (x, y)
+                    color: const Color.fromARGB(102, 26, 49, 123),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),

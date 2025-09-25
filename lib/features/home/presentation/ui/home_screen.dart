@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:remedi/features/home/presentation/bloc/hour_cubit.dart';
 import 'package:remedi/features/home/presentation/ui/widgets/calendar_info.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,6 +13,30 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   double reveal = 0.0;
   bool dragging = false;
+  final ScrollController _controller = ScrollController();
+
+  void scrollToPercent(double percent) {
+    final maxScroll = _controller.position.maxScrollExtent;
+    final target = maxScroll * percent;
+    _controller.jumpTo(target);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final today = DateTime.now();
+    final dateInHours = today.hour;
+    final percent = dateInHours * 3 / 24 - 1;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToPercent(
+        percent < 0
+            ? 0.0
+            : percent > 1
+            ? 1.0
+            : percent,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +55,40 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: [
                 SizedBox(height: paddingTopH),
-                Padding(padding: const EdgeInsets.all(8), child: Text(':)')),
+                Expanded(
+                  child: BlocBuilder<HourCubit, int>(
+                    builder: (context, state) {
+                      return SingleChildScrollView(
+                        controller: _controller,
+                        padding: EdgeInsetsGeometry.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: List.generate(
+                            24,
+                            (int index) => Container(
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: state == index
+                                    ? Color.fromARGB(100, 126, 154, 255)
+                                    : index.isEven
+                                    ? Color.fromARGB(154, 234, 238, 252)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Text('${'$index'.padLeft(2, '0')}:00'),
+                              ),
+                            ),
+                            growable: false,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -51,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
       right: 0,
       height: screenH,
       child: CalendarInfo(
+        height: screenH - 200,
         onSwipeUpClose: () {
           setState(() => reveal = 0.0);
         },
@@ -90,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title: const Text('AppBar'),
           elevation: 0,
           backgroundColor: const Color.fromARGB(255, 192, 207, 255),
+          surfaceTintColor: const Color.fromARGB(255, 192, 207, 255),
         ),
       ),
     );
